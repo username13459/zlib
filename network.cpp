@@ -399,6 +399,67 @@ namespace zlib
 		}
 
 
+		childSocket::childSocket(
+#ifdef _WIN32
+			SOCKET socket
+#elif __linux__
+			int socket
+#endif
+		)
+		{
+			ConnectSocket = socket;
+		}
+
+		
+		socketListener::socketListener()
+		{
+			error(notOpened);
+		}
+
+		socketListener::socketListener(unsigned localPort)
+		{
+			initializeSocket("", localPort, server);
+		}
+
+		childSocket socketListener::listenForConnection()
+		{
+			//Start listening
+#ifdef _WIN32
+
+			SOCKET newSock;
+
+			if(listen(ConnectSocket, SOMAXCONN) == SOCKET_ERROR)
+			{
+				error(listenError, WSAGetLastError(), true);
+				closesocket(ConnectSocket);
+				WSACleanup();
+				return;
+			}
+
+			newSock = INVALID_SOCKET;
+
+			newSock = accept(ConnectSocket, NULL, NULL);
+			if(newSock == INVALID_SOCKET)
+			{
+
+				error(acceptFailed, WSAGetLastError(), true);
+				closesocket(ConnectSocket);
+				WSACleanup();
+				throw acceptFailed;
+			}
+
+			return childSocket(newSock);
+#elif __linux__
+			int listenSocket;
+
+			listen(ConnectSocket, 0);
+
+			ClientSocket = accept(ConnectSocket, (struct sockaddr *) NULL, NULL);
+
+			if(ClientSocket < 0) error(acceptFailed);
+#endif
+		}
+
 
 		socketServer::socketServer()
 		{

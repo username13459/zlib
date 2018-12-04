@@ -118,6 +118,8 @@ namespace zlib
 			static string getErrorName(sockError e);
 		};
 
+
+
 		class socketServer : public socketBase
 		{
 			//Todo: merge ConnectScoket with ClientSocket, or make it so ClientSocket is scalable, and is potentially its own object?
@@ -138,6 +140,8 @@ namespace zlib
 
 			~socketServer() override  { closeSocket(); }
 		};
+		
+
 
 		class socketClient : public socketBase
 		{
@@ -152,6 +156,37 @@ namespace zlib
 			);
 
 			~socketClient() override { closeSocket(); }
+		};
+
+		class childSocket : public socketClient
+		{
+		public:
+			//Creates a new childSocket element around the already-connected socket 'socket'
+			childSocket(
+#ifdef _WIN32
+				SOCKET socket
+#elif __linux__
+				int socket
+#endif
+			);
+		};
+
+
+
+		class socketListener : public socketBase
+		{
+		public:
+			socketListener();
+			socketListener(unsigned localPort);
+		protected:
+			/*#ifdef _WIN32
+						SOCKET ClientSocket;
+			#elif __linux__
+						int ClientSocket;
+			#endif*/
+		public:
+			//Listens for a new connection, and returns a 'childSocket' with the new connection upon success
+			childSocket listenForConnection();
 		};
 	}
 }
