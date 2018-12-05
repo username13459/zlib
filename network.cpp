@@ -433,7 +433,7 @@ namespace zlib
 				error(listenError, WSAGetLastError(), true);
 				closesocket(ConnectSocket);
 				WSACleanup();
-				return;
+				throw listenError;
 			}
 
 			newSock = INVALID_SOCKET;
