@@ -451,12 +451,15 @@ namespace zlib
 			return childSocket(newSock);
 #elif __linux__
 			int listenSocket;
+			int newSock;
 
 			listen(ConnectSocket, 0);
 
-			ClientSocket = accept(ConnectSocket, (struct sockaddr *) NULL, NULL);
+			newSock = accept(ConnectSocket, (struct sockaddr *) NULL, NULL);
 
-			if(ClientSocket < 0) error(acceptFailed);
+			if(newSock < 0) error(acceptFailed);
+
+			return childSocket(newSock);
 #endif
 		}
 
