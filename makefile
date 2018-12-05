@@ -5,11 +5,15 @@ all_files = cryptography.cpp cryptography.h draw.cpp draw.h fileIO.cpp fileIO.h 
 debug_flags = -g
 debug_indicator_file = debug_made.txt
 
-all: $(all_files)
+all: zlib.h.gch
+
+zlib.h.gch: $(all_files)
 	rm -rf $(debug_indicator_file)
 	g++ -c $(all_files) -std=c++11
 
-debug: $(all_files)
+debug: $(debug_indicator_file)
+
+$(debug_indicator_file): $(all_files)
 	rm -rf $(debug_indicator_file)
 	g++ -c $(all_files) -std=c++11 $(debug_flags)
 	echo "Zlib compiled in debug mode" > $(debug_indicator_file)
